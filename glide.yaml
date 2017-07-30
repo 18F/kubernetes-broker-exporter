@@ -1,0 +1,18 @@
+package: github.com/18F/kubernetes-broker-exporter
+import:
+- package: github.com/prometheus/client_golang
+  subpackages:
+  - prometheus
+- package: github.com/prometheus/common
+  subpackages:
+  - log
+- package: k8s.io/api
+  subpackages:
+  - core/v1
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1
+- package: k8s.io/client-go
+  subpackages:
+  - kubernetes
+  - rest
