@@ -31,6 +31,7 @@ func NewElasticsearchCollector(
 	client kubernetes.Interface,
 	checker func(host string, port int32, password string) (alive, healthy, latency float64),
 	metricsNamespace string,
+	environment string,
 	kubernetesNamespace string,
 	serviceDomain string,
 	serviceGUIDs []string,
@@ -47,6 +48,9 @@ func NewElasticsearchCollector(
 				Subsystem: "elasticsearch",
 				Name:      "alive",
 				Help:      "Elasticsearch service available",
+				ConstLabels: prometheus.Labels{
+					"environment": environment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		),
@@ -56,6 +60,9 @@ func NewElasticsearchCollector(
 				Subsystem: "elasticsearch",
 				Name:      "healthy",
 				Help:      "Elasticsearch service healthy",
+				ConstLabels: prometheus.Labels{
+					"environment": environment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		),
@@ -65,6 +72,9 @@ func NewElasticsearchCollector(
 				Subsystem: "elasticsearch",
 				Name:      "latency",
 				Help:      "Elasticsearch service latency",
+				ConstLabels: prometheus.Labels{
+					"environment": environment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		),

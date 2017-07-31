@@ -27,6 +27,7 @@ var (
 	authUsername              = flag.String("web.auth.username", "", "Username for web interface basic auth")
 	authPassword              = flag.String("web.auth.password", "", "Password for web interface basic auth")
 	metricsNamespace          = flag.String("metrics.namespace", "kubernetes_broker", "Metrics Namespace")
+	metricsEnvironment        = flag.String("metrics.environment", "", "Environment label to be attached to metrics")
 )
 
 func overrideFlagsWithEnvVars() {
@@ -41,6 +42,7 @@ func overrideFlagsWithEnvVars() {
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_AUTH_USERNAME", authUsername)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_AUTH_PASSWORD", authPassword)
 	overrideWithEnvVar("BROKER_EXPORTER_METRICS_NAMESPACE", metricsNamespace)
+	overrideWithEnvVar("BROKER_EXPORTER_METRICS_ENVIRONMENT", metricsEnvironment)
 }
 
 func overrideWithEnvVar(name string, value *string) {
@@ -107,6 +109,7 @@ func main() {
 				client,
 				collectors.CheckElasticsearchHealth,
 				*metricsNamespace,
+				*metricsEnvironment,
 				*kubernetesNamespace,
 				*consulDomain,
 				strings.Split(*elasticsearchServiceGUIDs, ","),

@@ -18,6 +18,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 		client                 kubernetes.Interface
 		checker                func(host string, port int32, password string) (alive, healthy, latency float64)
 		metricsNamespace       string
+		metricsEnvironment     string
 		kubernetesNamespace    string
 		serviceDomain          string
 		serviceGUIDs           []string
@@ -38,6 +39,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 
 	BeforeEach(func() {
 		metricsNamespace = "test_exporter"
+		metricsEnvironment = "test"
 		kubernetesNamespace = "default"
 		serviceDomain = "service.kubernetes"
 		serviceGUIDs = []string{"service-guid"}
@@ -52,6 +54,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 			client,
 			checker,
 			metricsNamespace,
+			metricsEnvironment,
 			kubernetesNamespace,
 			serviceDomain,
 			serviceGUIDs,
@@ -63,6 +66,9 @@ var _ = Describe("ElasticsearchCollector", func() {
 				Subsystem: "elasticsearch",
 				Name:      "alive",
 				Help:      "Elasticsearch service available",
+				ConstLabels: prometheus.Labels{
+					"environment": metricsEnvironment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		)
@@ -78,6 +84,9 @@ var _ = Describe("ElasticsearchCollector", func() {
 				Subsystem: "elasticsearch",
 				Name:      "healthy",
 				Help:      "Elasticsearch service healthy",
+				ConstLabels: prometheus.Labels{
+					"environment": metricsEnvironment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		)
@@ -93,6 +102,9 @@ var _ = Describe("ElasticsearchCollector", func() {
 				Subsystem: "elasticsearch",
 				Name:      "latency",
 				Help:      "Elasticsearch service latency",
+				ConstLabels: prometheus.Labels{
+					"environment": metricsEnvironment,
+				},
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		)
