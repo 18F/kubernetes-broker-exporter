@@ -16,10 +16,12 @@ import (
 )
 
 type ElasticsearchCollector struct {
-	client                kubernetes.Interface
-	namespace             string
-	serviceDomain         string
-	serviceGUIDs          []string
+	client        kubernetes.Interface
+	checker       func(host string, port int32, password string) (alive, healthy, latency float64)
+	namespace     string
+	serviceDomain string
+	serviceGUIDs  []string
+
 	instanceAliveMetric   *prometheus.GaugeVec
 	instanceHealthyMetric *prometheus.GaugeVec
 	instanceLatencyMetric *prometheus.GaugeVec
@@ -27,6 +29,7 @@ type ElasticsearchCollector struct {
 
 func NewElasticsearchCollector(
 	client kubernetes.Interface,
+	checker func(host string, port int32, password string) (alive, healthy, latency float64),
 	metricsNamespace string,
 	kubernetesNamespace string,
 	serviceDomain string,
@@ -34,6 +37,7 @@ func NewElasticsearchCollector(
 ) *ElasticsearchCollector {
 	return &ElasticsearchCollector{
 		client:        client,
+		checker:       checker,
 		namespace:     kubernetesNamespace,
 		serviceDomain: serviceDomain,
 		serviceGUIDs:  serviceGUIDs,
@@ -41,8 +45,8 @@ func NewElasticsearchCollector(
 			prometheus.GaugeOpts{
 				Namespace: metricsNamespace,
 				Subsystem: "elasticsearch",
-				Name:      "healthy",
-				Help:      "Elasticsearch service healthy",
+				Name:      "alive",
+				Help:      "Elasticsearch service available",
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		),
@@ -50,8 +54,8 @@ func NewElasticsearchCollector(
 			prometheus.GaugeOpts{
 				Namespace: metricsNamespace,
 				Subsystem: "elasticsearch",
-				Name:      "alive",
-				Help:      "Elasticsearch service available",
+				Name:      "healthy",
+				Help:      "Elasticsearch service healthy",
 			},
 			[]string{"service_guid", "plan_guid", "instance_guid"},
 		),
@@ -119,7 +123,7 @@ func (c *ElasticsearchCollector) Collect(ch chan<- prometheus.Metric) error {
 				ports[port.Port] = port.NodePort
 			}
 
-			alive, healthy, latency := c.clusterHealth(
+			alive, healthy, latency := c.checker(
 				fmt.Sprintf("%s.%s", service.Name, c.serviceDomain),
 				ports[9200],
 				values["password"],
@@ -155,7 +159,7 @@ type clusterHealthResponse struct {
 	Status string `json:"status"`
 }
 
-func (c *ElasticsearchCollector) clusterHealth(host string, port int32, password string) (alive float64, healthy float64, latency float64) {
+func CheckElasticsearchHealth(host string, port int32, password string) (alive, healthy, latency float64) {
 	client := &http.Client{Timeout: time.Second * 60}
 
 	log.Infof("Checking cluster health at http://root:%s@%s:%d/_cluster/health", password, host, port)

@@ -105,6 +105,7 @@ func main() {
 		[]collectors.Collector{
 			collectors.NewElasticsearchCollector(
 				client,
+				collectors.CheckElasticsearchHealth,
 				*metricsNamespace,
 				*kubernetesNamespace,
 				*consulDomain,
