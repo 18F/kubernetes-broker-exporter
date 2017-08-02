@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -16,11 +15,11 @@ import (
 )
 
 type ElasticsearchCollector struct {
-	client        kubernetes.Interface
-	checker       func(host string, port int32, password string) (alive, healthy, latency float64)
-	namespace     string
-	serviceDomain string
-	serviceGUIDs  []string
+	client         kubernetes.Interface
+	checker        func(host string, port int32, password string) (alive, healthy, latency float64)
+	namespace      string
+	serviceDomain  string
+	collectorLabel string
 
 	instanceAliveMetric   *prometheus.GaugeVec
 	instanceHealthyMetric *prometheus.GaugeVec
@@ -34,14 +33,14 @@ func NewElasticsearchCollector(
 	environment string,
 	kubernetesNamespace string,
 	serviceDomain string,
-	serviceGUIDs []string,
+	collectorLabel string,
 ) *ElasticsearchCollector {
 	return &ElasticsearchCollector{
-		client:        client,
-		checker:       checker,
-		namespace:     kubernetesNamespace,
-		serviceDomain: serviceDomain,
-		serviceGUIDs:  serviceGUIDs,
+		client:         client,
+		checker:        checker,
+		namespace:      kubernetesNamespace,
+		serviceDomain:  serviceDomain,
+		collectorLabel: collectorLabel,
 		instanceAliveMetric: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: metricsNamespace,
@@ -71,7 +70,7 @@ func NewElasticsearchCollector(
 				Namespace: metricsNamespace,
 				Subsystem: "elasticsearch",
 				Name:      "latency",
-				Help:      "Elasticsearch service latency",
+				Help:      "Elasticsearch service latency in milliseconds",
 				ConstLabels: prometheus.Labels{
 					"environment": environment,
 				},
@@ -93,14 +92,14 @@ func (c *ElasticsearchCollector) Collect(ch chan<- prometheus.Metric) error {
 	c.instanceLatencyMetric.Reset()
 
 	services, err := c.client.CoreV1().Services(c.namespace).List(metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("catalog_service_id in (%s)", strings.Join(c.serviceGUIDs, ",")),
+		LabelSelector: fmt.Sprintf("collector = %s", c.collectorLabel),
 	})
 	if err != nil {
 		return err
 	}
 
 	secrets, err := c.client.CoreV1().Secrets(c.namespace).List(metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("catalog_service_id in (%s)", strings.Join(c.serviceGUIDs, ",")),
+		LabelSelector: fmt.Sprintf("collector = %s", c.collectorLabel),
 	})
 	if err != nil {
 		return err
@@ -182,16 +181,20 @@ func CheckElasticsearchHealth(host string, port int32, password string) (alive, 
 
 	start := time.Now()
 	resp, err := client.Do(req)
-	latency = time.Since(start).Seconds()
+	latency = time.Since(start).Seconds() * 1000
 
-	if err != nil || resp.StatusCode != http.StatusOK {
-		log.Errorf("Invalid HTTP auth from `%s`", err.Error())
-		return
+	if err != nil {
+		log.Errorf("Error checking cluster health: %s", err.Error())
 	}
 
 	alive = 1
-	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("Bad status code from cluster health check: expected %d, got %d", http.StatusOK, resp.StatusCode)
+		return
+	}
+
+	defer resp.Body.Close()
 	var health clusterHealthResponse
 	if err := json.NewDecoder(resp.Body).Decode(&health); err != nil {
 		return

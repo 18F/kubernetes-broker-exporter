@@ -5,7 +5,6 @@ import (
 	"flag"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
@@ -16,18 +15,18 @@ import (
 )
 
 var (
-	kubernetesURL             = flag.String("kubernetes.url", "", "Kubernetes URL")
-	kubernetesUsername        = flag.String("kubernetes.username", "", "Kubernetes username")
-	kubernetesPassword        = flag.String("kubernetes.password", "", "Kubernetes password")
-	kubernetesNamespace       = flag.String("kubernetes.namespace", "default", "Kubernetes namespace")
-	consulDomain              = flag.String("consul.domain", "service.kubernetes", "Consul service domain")
-	elasticsearchServiceGUIDs = flag.String("elasticsearch.services", "", "Elasticsearch service GUIDs")
-	metricsPath               = flag.String("web.telemetry-path", "/metrics", "Path under which to expose Prometheus metrics")
-	listenAddress             = flag.String("web.listen-address", ":9191", "Address to listen on for web interface and telemetry")
-	authUsername              = flag.String("web.auth.username", "", "Username for web interface basic auth")
-	authPassword              = flag.String("web.auth.password", "", "Password for web interface basic auth")
-	metricsNamespace          = flag.String("metrics.namespace", "kubernetes_broker", "Metrics Namespace")
-	metricsEnvironment        = flag.String("metrics.environment", "", "Environment label to be attached to metrics")
+	kubernetesURL               = flag.String("kubernetes.url", "", "Kubernetes URL")
+	kubernetesUsername          = flag.String("kubernetes.username", "", "Kubernetes username")
+	kubernetesPassword          = flag.String("kubernetes.password", "", "Kubernetes password")
+	kubernetesNamespace         = flag.String("kubernetes.namespace", "default", "Kubernetes namespace")
+	consulDomain                = flag.String("consul.domain", "service.kubernetes", "Consul service domain")
+	elasticsearchCollectorLabel = flag.String("elasticsearch.collector-label", "elasticsearch", "Elasticsearch collector label")
+	metricsPath                 = flag.String("web.telemetry-path", "/metrics", "Path under which to expose Prometheus metrics")
+	listenAddress               = flag.String("web.listen-address", ":9191", "Address to listen on for web interface and telemetry")
+	authUsername                = flag.String("web.auth.username", "", "Username for web interface basic auth")
+	authPassword                = flag.String("web.auth.password", "", "Password for web interface basic auth")
+	metricsNamespace            = flag.String("metrics.namespace", "kubernetes_broker", "Metrics Namespace")
+	metricsEnvironment          = flag.String("metrics.environment", "", "Environment label to be attached to metrics")
 )
 
 func overrideFlagsWithEnvVars() {
@@ -36,7 +35,7 @@ func overrideFlagsWithEnvVars() {
 	overrideWithEnvVar("BROKER_EXPORTER_KUBERNETES_PASSWORD", kubernetesPassword)
 	overrideWithEnvVar("BROKER_EXPORTER_KUBERNETES_NAMESPACE", kubernetesNamespace)
 	overrideWithEnvVar("BROKER_EXPORTER_CONSUL_DOMAIN", consulDomain)
-	overrideWithEnvVar("BROKER_EXPORTER_ELASTICSEARCH_SERVICES", elasticsearchServiceGUIDs)
+	overrideWithEnvVar("BROKER_EXPORTER_ELASTICSEARCH_COLLECTOR_LABEL", elasticsearchCollectorLabel)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_METRICS_PATH", metricsPath)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_LISTEN_ADDRESS", listenAddress)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_AUTH_USERNAME", authUsername)
@@ -112,7 +111,7 @@ func main() {
 				*metricsEnvironment,
 				*kubernetesNamespace,
 				*consulDomain,
-				strings.Split(*elasticsearchServiceGUIDs, ","),
+				*elasticsearchCollectorLabel,
 			),
 		},
 	)
