@@ -21,7 +21,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 		metricsEnvironment     string
 		kubernetesNamespace    string
 		serviceDomain          string
-		serviceGUIDs           []string
+		collectorLabel         string
 		elasticsearchCollector *collectors.ElasticsearchCollector
 
 		instanceAliveMetric   *prometheus.GaugeVec
@@ -42,7 +42,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 		metricsEnvironment = "test"
 		kubernetesNamespace = "default"
 		serviceDomain = "service.kubernetes"
-		serviceGUIDs = []string{"service-guid"}
+		collectorLabel = "elasticsearch"
 
 		catalogServiceID = "service-guid"
 		catalogPlanID = "plan-guid"
@@ -57,7 +57,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 			metricsEnvironment,
 			kubernetesNamespace,
 			serviceDomain,
-			serviceGUIDs,
+			collectorLabel,
 		)
 
 		instanceAliveMetric = prometheus.NewGaugeVec(
@@ -101,7 +101,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 				Namespace: metricsNamespace,
 				Subsystem: "elasticsearch",
 				Name:      "latency",
-				Help:      "Elasticsearch service latency",
+				Help:      "Elasticsearch service latency in milliseconds",
 				ConstLabels: prometheus.Labels{
 					"environment": metricsEnvironment,
 				},
@@ -148,6 +148,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 									Name:      "service-discovery",
 									Namespace: "default",
 									Labels: map[string]string{
+										"collector":          collectorLabel,
 										"catalog_service_id": catalogServiceID,
 										"catalog_plan_id":    catalogPlanID,
 										"service_id":         serviceID,
@@ -159,6 +160,7 @@ var _ = Describe("ElasticsearchCollector", func() {
 									Name:      "service-rest",
 									Namespace: "default",
 									Labels: map[string]string{
+										"collector":          collectorLabel,
 										"catalog_service_id": catalogServiceID,
 										"catalog_plan_id":    catalogPlanID,
 										"service_id":         serviceID,
