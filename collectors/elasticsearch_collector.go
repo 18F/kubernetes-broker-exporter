@@ -185,6 +185,7 @@ func CheckElasticsearchHealth(host string, port int32, password string) (alive, 
 
 	if err != nil {
 		log.Errorf("Error checking cluster health: %s", err.Error())
+		return
 	}
 
 	alive = 1
