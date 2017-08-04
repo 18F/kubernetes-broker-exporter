@@ -6,3 +6,4 @@ Goals:
 
 Supported services:
 * elasticsearch
+* redis

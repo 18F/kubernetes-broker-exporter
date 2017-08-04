@@ -113,10 +113,6 @@ func (c *ElasticsearchCollector) Collect(ch chan<- prometheus.Metric) error {
 
 	wg := &sync.WaitGroup{}
 	for _, service := range services.Items {
-		// Skip discovery service
-		if service.Spec.Type != apiv1.ServiceTypeNodePort {
-			continue
-		}
 		wg.Add(1)
 		go func(service apiv1.Service) {
 			defer wg.Done()
@@ -171,7 +167,7 @@ type clusterHealthResponse struct {
 func CheckElasticsearchHealth(host string, port int32, password string) (alive, healthy, latency float64) {
 	client := &http.Client{Timeout: time.Second * 60}
 
-	log.Infof("Checking cluster health at http://root:%s@%s:%d/_cluster/health", password, host, port)
+	log.Infof("Checking cluster health at http://%s:%d/_cluster/health", host, port)
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:%d/_cluster/health", host, port), nil)
 	if err != nil {
 		log.Errorf("Invalid HTTP auth from `%s`", err.Error())
