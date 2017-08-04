@@ -21,6 +21,7 @@ var (
 	kubernetesNamespace         = flag.String("kubernetes.namespace", "default", "Kubernetes namespace")
 	consulDomain                = flag.String("consul.domain", "service.kubernetes", "Consul service domain")
 	elasticsearchCollectorLabel = flag.String("elasticsearch.collector-label", "elasticsearch", "Elasticsearch collector label")
+	redisCollectorLabel         = flag.String("redis.collector-label", "redis", "Redis collector label")
 	metricsPath                 = flag.String("web.telemetry-path", "/metrics", "Path under which to expose Prometheus metrics")
 	listenAddress               = flag.String("web.listen-address", ":9191", "Address to listen on for web interface and telemetry")
 	authUsername                = flag.String("web.auth.username", "", "Username for web interface basic auth")
@@ -36,6 +37,7 @@ func overrideFlagsWithEnvVars() {
 	overrideWithEnvVar("BROKER_EXPORTER_KUBERNETES_NAMESPACE", kubernetesNamespace)
 	overrideWithEnvVar("BROKER_EXPORTER_CONSUL_DOMAIN", consulDomain)
 	overrideWithEnvVar("BROKER_EXPORTER_ELASTICSEARCH_COLLECTOR_LABEL", elasticsearchCollectorLabel)
+	overrideWithEnvVar("BROKER_EXPORTER_REDIS_COLLECTOR_LABEL", redisCollectorLabel)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_METRICS_PATH", metricsPath)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_LISTEN_ADDRESS", listenAddress)
 	overrideWithEnvVar("BROKER_EXPORTER_WEB_AUTH_USERNAME", authUsername)
@@ -112,6 +114,15 @@ func main() {
 				*kubernetesNamespace,
 				*consulDomain,
 				*elasticsearchCollectorLabel,
+			),
+			collectors.NewRedisCollector(
+				client,
+				collectors.CheckRedisHealth,
+				*metricsNamespace,
+				*metricsEnvironment,
+				*kubernetesNamespace,
+				*consulDomain,
+				*redisCollectorLabel,
 			),
 		},
 	)
