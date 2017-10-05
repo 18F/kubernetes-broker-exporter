@@ -4,3 +4,4 @@ applications:
   command: BROKER_EXPORTER_WEB_LISTEN_ADDRESS=":$PORT" kubernetes-broker-exporter
   buildpack: go_buildpack
   memory: 128M
+  instances: 2
