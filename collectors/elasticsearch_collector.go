@@ -165,7 +165,7 @@ type clusterHealthResponse struct {
 }
 
 func CheckElasticsearchHealth(host string, port int32, password string) (alive, healthy, latency float64) {
-	client := &http.Client{Timeout: time.Second * 60}
+	client := &http.Client{Timeout: time.Second * 1}
 
 	log.Infof("Checking cluster health at http://%s:%d/_cluster/health", host, port)
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:%d/_cluster/health", host, port), nil)
