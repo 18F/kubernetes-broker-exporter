@@ -2,6 +2,7 @@ package collectors
 
 import (
 	"sync"
+	"unsafe"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
@@ -72,6 +73,12 @@ func (c *BrokerCollector) collect(ch chan<- prometheus.Metric) error {
 	case err := <-errChannel:
 		return err
 	}
+
+	var x unsafe.Pointer
+	var y uintptr
+	x = unsafe.Pointer(y) // ERROR "possible misuse of unsafe.Pointer"
+	y = uintpr(x)
+	fmt.Println(x)
 
 	return nil
 }
