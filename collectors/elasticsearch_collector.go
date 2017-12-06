@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// ElasticsearchCollector exports redis health metrics
 type ElasticsearchCollector struct {
 	client         kubernetes.Interface
 	checker        func(host string, port int32, password string) (alive, healthy, latency float64)
@@ -26,6 +27,7 @@ type ElasticsearchCollector struct {
 	instanceLatencyMetric *prometheus.GaugeVec
 }
 
+// NewElasticsearchCollector creates a new ElasticsearchCollector
 func NewElasticsearchCollector(
 	client kubernetes.Interface,
 	checker func(host string, port int32, password string) (alive, healthy, latency float64),
@@ -80,12 +82,14 @@ func NewElasticsearchCollector(
 	}
 }
 
+// Describe exports metric descriptions
 func (c *ElasticsearchCollector) Describe(ch chan<- *prometheus.Desc) {
 	c.instanceAliveMetric.Describe(ch)
 	c.instanceHealthyMetric.Describe(ch)
 	c.instanceLatencyMetric.Describe(ch)
 }
 
+// Collect exports metric values
 func (c *ElasticsearchCollector) Collect(ch chan<- prometheus.Metric) error {
 	c.instanceAliveMetric.Reset()
 	c.instanceHealthyMetric.Reset()
@@ -164,6 +168,7 @@ type clusterHealthResponse struct {
 	Status string `json:"status"`
 }
 
+// CheckElasticsearchHealth connects to an elasticsearch instance and reports health metrics
 func CheckElasticsearchHealth(host string, port int32, password string) (alive, healthy, latency float64) {
 	client := &http.Client{Timeout: time.Second * 1}
 
