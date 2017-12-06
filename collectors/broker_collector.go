@@ -7,15 +7,18 @@ import (
 	"github.com/prometheus/common/log"
 )
 
+// Collector exports health metrics for brokered services
 type Collector interface {
 	Collect(ch chan<- prometheus.Metric) error
 	Describe(ch chan<- *prometheus.Desc)
 }
 
+// BrokerCollector implements the `Collector` interface
 type BrokerCollector struct {
 	collectors []Collector
 }
 
+// NewBrokerCollector creates a new BrokerCollector
 func NewBrokerCollector(
 	collectors []Collector,
 ) *BrokerCollector {
@@ -24,6 +27,7 @@ func NewBrokerCollector(
 	}
 }
 
+// Describe exports metric descriptions
 func (c *BrokerCollector) Describe(ch chan<- *prometheus.Desc) {
 	wg := &sync.WaitGroup{}
 	for _, collector := range c.collectors {
@@ -36,6 +40,7 @@ func (c *BrokerCollector) Describe(ch chan<- *prometheus.Desc) {
 	wg.Wait()
 }
 
+// Collect exports metric values
 func (c *BrokerCollector) Collect(ch chan<- prometheus.Metric) {
 	if err := c.collect(ch); err != nil {
 		log.Error(err)

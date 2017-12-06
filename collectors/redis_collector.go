@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// RedisCollector exports redis health metrics
 type RedisCollector struct {
 	client         kubernetes.Interface
 	checker        func(host string, port int32, password string) (alive, healthy, latency float64)
@@ -27,6 +28,7 @@ type RedisCollector struct {
 	instanceLatencyMetric *prometheus.GaugeVec
 }
 
+// NewRedisCollector creates a new RedisCollector
 func NewRedisCollector(
 	client kubernetes.Interface,
 	checker func(host string, port int32, password string) (alive, healthy, latency float64),
@@ -81,12 +83,14 @@ func NewRedisCollector(
 	}
 }
 
+// Describe exports metric descriptions
 func (c *RedisCollector) Describe(ch chan<- *prometheus.Desc) {
 	c.instanceAliveMetric.Describe(ch)
 	c.instanceHealthyMetric.Describe(ch)
 	c.instanceLatencyMetric.Describe(ch)
 }
 
+// Collect exports metric values
 func (c *RedisCollector) Collect(ch chan<- prometheus.Metric) error {
 	c.instanceAliveMetric.Reset()
 	c.instanceHealthyMetric.Reset()
@@ -161,6 +165,7 @@ func (c *RedisCollector) Collect(ch chan<- prometheus.Metric) error {
 	return nil
 }
 
+// CheckRedisHealth connects to a redis instance and reports health metrics
 func CheckRedisHealth(host string, port int32, password string) (alive, healthy, latency float64) {
 	log.Infof("Sending INFO to redis server at %s:%d", host, port)
 
