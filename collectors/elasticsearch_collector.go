@@ -127,14 +127,22 @@ func (c *ElasticsearchCollector) Collect(ch chan<- prometheus.Metric) error {
 				}
 			}
 
-			ports := map[int32]int32{}
+			var nodePort int32
 			for _, port := range service.Spec.Ports {
-				ports[port.Port] = port.NodePort
+				// Note: Port is 80 when using NGINX proxy and 9200 otherwise
+				if port.Port == 80 || port.Port == 9200 {
+					nodePort = port.NodePort
+					break
+				}
+			}
+			if nodePort == 0 {
+				log.Errorf("Node port for service %s not found", service.ObjectMeta.Labels["service_id"])
+				return
 			}
 
 			alive, healthy, latency := c.checker(
 				fmt.Sprintf("%s.%s", service.Name, c.serviceDomain),
-				ports[9200],
+				nodePort,
 				values["password"],
 			)
 

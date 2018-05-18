@@ -168,6 +168,9 @@ var _ = Describe("ElasticsearchCollector", func() {
 								},
 								Spec: apiv1.ServiceSpec{
 									Type: apiv1.ServiceTypeNodePort,
+									Ports: []apiv1.ServicePort{
+										{Port: 9200, NodePort: 30001},
+									},
 								},
 							},
 						},
