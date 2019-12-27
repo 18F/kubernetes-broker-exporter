@@ -1,0 +1,48 @@
+module github.com/18f/kubernetes-broker-exporter
+
+go 1.13
+
+require (
+	github.com/18F/kubernetes-broker-exporter v0.0.0-20180518195424-55813bb2ccd2
+	github.com/PuerkitoBio/purell v1.0.0
+	github.com/PuerkitoBio/urlesc v0.0.0-20160726150825-5bd2802263f2
+	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
+	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf
+	github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a
+	github.com/davecgh/go-spew v1.1.1-0.20170626231645-782f4967f2dc
+	github.com/emicklei/go-restful v1.1.4-0.20170410110728-ff4f55a20633
+	github.com/emicklei/go-restful-swagger12 v0.0.0-20170208215640-dcef7f557305
+	github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680
+	github.com/go-openapi/jsonpointer v0.0.0-20160704185906-46af16f9f7b1
+	github.com/go-openapi/jsonreference v0.0.0-20160704190145-13c6e3589ad9
+	github.com/go-openapi/spec v0.0.0-20160808142527-6aced65f8501
+	github.com/go-openapi/swag v0.0.0-20160704191624-1d0bd113de87
+	github.com/go-redis/redis v6.5.6+incompatible
+	github.com/gogo/protobuf v0.0.0-20170330071051-c0656edd0d9e
+	github.com/golang/glog v0.0.0-20141105023935-44145f04b68c
+	github.com/golang/protobuf v1.2.0
+	github.com/google/gofuzz v0.0.0-20161122191042-44d81051d367
+	github.com/googleapis/gnostic v0.0.0-20170426233943-68f4ded48ba9
+	github.com/juju/ratelimit v0.0.0-20170523012141-5b9ff8664717
+	github.com/mailru/easyjson v0.0.0-20160728113105-d5b7844b561a
+	github.com/matttproud/golang_protobuf_extensions v1.0.1
+	github.com/onsi/ginkgo v1.11.0
+	github.com/onsi/gomega v1.8.1
+	github.com/prometheus/client_golang v0.8.1-0.20170724081313-94ff84a9a6eb
+	github.com/prometheus/client_model v0.0.0-20170216185247-6f3806018612
+	github.com/prometheus/common v0.0.0-20170731114204-61f87aac8082
+	github.com/prometheus/procfs v0.0.0-20170703101242-e645f4e5aaa8
+	github.com/sirupsen/logrus v1.0.2-0.20170728074214-181d419aa9e2
+	github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff
+	github.com/ugorji/go v0.0.0-20170107133203-ded73eae5db7
+	golang.org/x/crypto v0.0.0-20161006174701-d172538b2cfc
+	golang.org/x/net v0.0.0-20180906233101-161cd47e91fd
+	golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e
+	golang.org/x/text v0.3.0
+	gopkg.in/alecthomas/kingpin.v2 v2.2.5
+	gopkg.in/inf.v0 v0.9.0
+	gopkg.in/yaml.v2 v2.2.4
+	k8s.io/api v0.0.0-20170719033850-4d5cc6efc5e8
+	k8s.io/apimachinery v0.0.0-20170719033815-6134cb2da6d9
+	k8s.io/client-go v0.0.0-20170719033924-7c69e9802107
+)
