@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/18F/kubernetes-broker-exporter/collectors"
+	"github.com/18f/kubernetes-broker-exporter/collectors"
 )
 
 var (
